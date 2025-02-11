@@ -20,7 +20,6 @@
 
 - [State of the art in Artistic Editing of Appearence, Lighting and Material](https://hal.science/hal-01295265v1)
 
-
 ### Technologies connues
 
 - [Lightrig.de](http://www.lightrig.de/)
