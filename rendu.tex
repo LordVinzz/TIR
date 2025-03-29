@@ -113,6 +113,77 @@ La méthode proposée transfère les micro et méso-structures de texture des ph
 L'approche permet également un contrôle spatial précis, permettant de transférer l'apparence de plusieurs photos cibles vers différentes régions d'un même matériau. Les applications incluent l'amélioration de matériaux procéduraux qui manquent souvent de réalisme, la création de nouveaux matériaux à partir de références photographiques simples, et la conception de scènes 3D avec des matériaux cohérents et réalistes.
 
 \newpage
+\section{Analysis of the path space for light and shadow compositing}
+Cet article nous présente les principales méthodes et approches permettant de modifier la lumière ainsi que les ombres dans une animation.
+
+Il se concentre sur les avantages que chaque approche a apporté ainsi que les inconvénients qui ont ainsi mener à l’élaboration de nouvelles méthodes encore et encore, faisant de ce domaine un domaine avec des améliorations constantes.
+
+D’ailleurs la première partie après l’introduction est un état de l’Art, nous permettant de nous familiariser avec les notions de ce domaine qu’est l’édition de la lumière.
+
+Ces premières approches sont donc méthode d’Anjyo, la méthode Kawai, l’Inverse rendering, Differentiable Rendering ou encore RayPortals.
+
+L’état de l’Art est alors assez complet et chaque point est clairement détaillé offrant une compréhension net du sujet.
+
+Ce qui ressort de cet état de l’art est que malgré les différentes approches, un problème persiste : le coût en temps de calculs et en mémoire.
+
+Ce qui nous amène à la partie 3. Pour résoudre cet obstacle, des chercheurs ont mis au point le path Space Clustering qui permet d’améliorer le compositing en post-production en organisant mieux les informations de lumière dans une scène 3D.
+
+Ces informations sont stockées sous forme de Arbitrary Output Variables.
+
+La simulation le transport de la lumière et son interaction sur les surfaces, différentes équations physiques comme la radiance et la formule du rendu.
+
+De plus, pour réduire le nombre de chemins lumineux, des expressions régulières sont utilisés. Cette approche a donc été testé sur sur 2 scènes : Coffee Maker et Marbles via le moteur pbrt-v3.
+
+Les résultats sont très concluants, néanmoins il y a toujours un inconvénient qui est que les ombres ne peuvent pas être capter directement.
+
+La partie 4 présente alors à nouveau une nouvelle méthode pour répondre à ce problème : les shadow layers.
+
+A l’origine pour représenter des ombres, on utilisait des couches de niveau de gris mais cela manquant de réalisme, les shadow layers se sont imposés.
+
+On a ainsi approche beaucoup plus physique des ombres car les shadow layers représentent la perte d’énergie lumineuse dû à un objet.
+
+La Scène est alors divisée en plusieurs types d’objets : la source lumineuse, le shadow caster (bloque la lumière), le shadow catcher (reçoit la lumière), l’auto-ombre (l’ombre d’un objet sur lui-même) et l’ombre portée (l’ombre d’un objet sur un autre).
+
+Pour calculer un shadow layer, on vient comparer la version de la scène sans l’objet puis la version où l’objet est un trou noir. Les résultats sont bien présentés et sont concluants.
+
+Pour compléter cette approche, la partie 5 étend les shadow layers aux médias participatifs (le gaz, la fumée…) en utilisant une approche par intégrale de chemins. La dernière partie explique les axes d’amélioration comme améliorer la description des LPE, utiliser la covariance de la lumière ou ajouter un outil de pré-filtrage.
+
+Pour conclure, cet article est compréhensible, bien détaillé avec des figures clairs et cite ses références.
+
+Certains résultats sont cependant rapidement expliqués et ne font pas forcément l’objet d’une conclusion.
+
+\newpage
+\section{In-the-wild Material Appearance Editing using Perceptual Attributes}
+Cet article traite de la modification de l’apparence des matériaux d’objets dans une animation.
+
+Pour commencer, on nous expose l’état de l’art ainsi que les problèmes qui en découlent.
+
+Habituellement, c’est de la géométrie qui est utilisée pour modifier l’apparence des matériaux mais cela apporte son lot d’erreur.
+
+Ainsi l’approche que nous expose cet article est d’utiliser un modèle de réseau neuronal génératifs et une architecture utilisant des cellules "Selective Transfer Unit" (STU).
+
+Ce modèle sera entrainé grâce à une base de donnée de photo du monde réel. Cette base de donnée est composée de 45 500 images générées avec 13 géométries et 7 éclairages.
+
+Les images sont annotées par 2600 humains qui leur mettent une note de perception.
+
+De plus, une relation encodeur-decodeur est utilisée pour déconstruire l’image sous forme de code puis la reconstruire avec le nouvel aspect du matériau passé en paramètre. Le modèle est ainsi entrainé durant 2 jours. Cet entrainement est réalisé avec PyTorch, une RTX 3090 et est optimisé avec ADAM.
+
+Pour ce qui est des résultats, les images synthétisées ont été comparées avec des images provenant de Mitsuba 3 et cela correspond globalement, offrant alors un meilleur résultat que les approches précédentes.
+
+De plus, les cellules STU ont prouvés leur efficacité car sans elles le décodage est moins précis.
+
+L’article présente malgré tout les inconvénients qu’il reste à améliorer, notamment, que la modification s’avère difficile si la surface est trop brillante.
+
+Aussi, les attributs passés en paramètre avaient parfois un sens trop proche comme par exemple : le brillant et le métal rendant encore une fois compliqué la modification.
+
+A noter également que l’article présente la base de donnée comme étant trop homogène et refaire les tests avec un des datasets plus variés est donc une bonne piste d’amélioration.
+
+Enfin l’article nous précise que pour raison technique, la résolution des images était limitée.
+
+Pour conclure, bien qu’appropriée, la méthodologie manque un peu de clarté tout comme les résultats qui ne sont pas très clairement décrits rendant la compréhension plus difficile. L’état de l’art est aussi peu développée. Cependant, les limites de l’approche sont très claires et complètes.
+
+
+\newpage
 \section{Conclusion sur l'état de l'art}
 
 L'analyse chronologique des articles révèle une évolution significative des approches pour la manipulation de l'apparence des matériaux et de l'éclairage en informatique graphique.
