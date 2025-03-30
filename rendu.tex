@@ -113,6 +113,157 @@ La méthode proposée transfère les micro et méso-structures de texture des ph
 L'approche permet également un contrôle spatial précis, permettant de transférer l'apparence de plusieurs photos cibles vers différentes régions d'un même matériau. Les applications incluent l'amélioration de matériaux procéduraux qui manquent souvent de réalisme, la création de nouveaux matériaux à partir de références photographiques simples, et la conception de scènes 3D avec des matériaux cohérents et réalistes.
 
 \newpage
+\section{Analysis of the path space for light and shadow compositing}
+Cet article nous présente les principales méthodes et approches permettant de modifier la lumière ainsi que les ombres dans une animation.
+
+Il se concentre sur les avantages que chaque approche a apporté ainsi que les inconvénients qui ont ainsi mener à l’élaboration de nouvelles méthodes encore et encore, faisant de ce domaine un domaine avec des améliorations constantes.
+
+D’ailleurs la première partie après l’introduction est un état de l’Art, nous permettant de nous familiariser avec les notions de ce domaine qu’est l’édition de la lumière.
+
+Ces premières approches sont donc méthode d’Anjyo, la méthode Kawai, l’Inverse rendering, Differentiable Rendering ou encore RayPortals.
+
+L’état de l’Art est alors assez complet et chaque point est clairement détaillé offrant une compréhension net du sujet.
+
+Ce qui ressort de cet état de l’art est que malgré les différentes approches, un problème persiste : le coût en temps de calculs et en mémoire.
+
+Ce qui nous amène à la partie 3. Pour résoudre cet obstacle, des chercheurs ont mis au point le path Space Clustering qui permet d’améliorer le compositing en post-production en organisant mieux les informations de lumière dans une scène 3D.
+
+Ces informations sont stockées sous forme de Arbitrary Output Variables.
+
+La simulation le transport de la lumière et son interaction sur les surfaces, différentes équations physiques comme la radiance et la formule du rendu.
+
+De plus, pour réduire le nombre de chemins lumineux, des expressions régulières sont utilisés. Cette approche a donc été testé sur sur 2 scènes : Coffee Maker et Marbles via le moteur pbrt-v3.
+
+Les résultats sont très concluants, néanmoins il y a toujours un inconvénient qui est que les ombres ne peuvent pas être capter directement.
+
+La partie 4 présente alors à nouveau une nouvelle méthode pour répondre à ce problème : les shadow layers.
+
+A l’origine pour représenter des ombres, on utilisait des couches de niveau de gris mais cela manquant de réalisme, les shadow layers se sont imposés.
+
+On a ainsi approche beaucoup plus physique des ombres car les shadow layers représentent la perte d’énergie lumineuse dû à un objet.
+
+La Scène est alors divisée en plusieurs types d’objets : la source lumineuse, le shadow caster (bloque la lumière), le shadow catcher (reçoit la lumière), l’auto-ombre (l’ombre d’un objet sur lui-même) et l’ombre portée (l’ombre d’un objet sur un autre).
+
+Pour calculer un shadow layer, on vient comparer la version de la scène sans l’objet puis la version où l’objet est un trou noir. Les résultats sont bien présentés et sont concluants.
+
+Pour compléter cette approche, la partie 5 étend les shadow layers aux médias participatifs (le gaz, la fumée…) en utilisant une approche par intégrale de chemins. La dernière partie explique les axes d’amélioration comme améliorer la description des LPE, utiliser la covariance de la lumière ou ajouter un outil de pré-filtrage.
+
+Pour conclure, cet article est compréhensible, bien détaillé avec des figures clairs et cite ses références.
+
+Certains résultats sont cependant rapidement expliqués et ne font pas forcément l’objet d’une conclusion.
+
+\newpage
+\section{In-the-wild Material Appearance Editing using Perceptual Attributes}
+Cet article traite de la modification de l’apparence des matériaux d’objets dans une animation.
+
+Pour commencer, on nous expose l’état de l’art ainsi que les problèmes qui en découlent.
+
+Habituellement, c’est de la géométrie qui est utilisée pour modifier l’apparence des matériaux mais cela apporte son lot d’erreur.
+
+Ainsi l’approche que nous expose cet article est d’utiliser un modèle de réseau neuronal génératifs et une architecture utilisant des cellules "Selective Transfer Unit" (STU).
+
+Ce modèle sera entrainé grâce à une base de donnée de photo du monde réel. Cette base de donnée est composée de 45 500 images générées avec 13 géométries et 7 éclairages.
+
+Les images sont annotées par 2600 humains qui leur mettent une note de perception.
+
+De plus, une relation encodeur-decodeur est utilisée pour déconstruire l’image sous forme de code puis la reconstruire avec le nouvel aspect du matériau passé en paramètre. Le modèle est ainsi entrainé durant 2 jours. Cet entrainement est réalisé avec PyTorch, une RTX 3090 et est optimisé avec ADAM.
+
+Pour ce qui est des résultats, les images synthétisées ont été comparées avec des images provenant de Mitsuba 3 et cela correspond globalement, offrant alors un meilleur résultat que les approches précédentes.
+
+De plus, les cellules STU ont prouvés leur efficacité car sans elles le décodage est moins précis.
+
+L’article présente malgré tout les inconvénients qu’il reste à améliorer, notamment, que la modification s’avère difficile si la surface est trop brillante.
+
+Aussi, les attributs passés en paramètre avaient parfois un sens trop proche comme par exemple : le brillant et le métal rendant encore une fois compliqué la modification.
+
+A noter également que l’article présente la base de donnée comme étant trop homogène et refaire les tests avec un des datasets plus variés est donc une bonne piste d’amélioration.
+
+Enfin l’article nous précise que pour raison technique, la résolution des images était limitée.
+
+Pour conclure, bien qu’appropriée, la méthodologie manque un peu de clarté tout comme les résultats qui ne sont pas très clairement décrits rendant la compréhension plus difficile. L’état de l’art est aussi peu développée. Cependant, les limites de l’approche sont très claires et complètes.
+
+\newpage
+\section{State of the Art in Artistic Editing of Appearance, Lighting, and Material}
+Ce document est un état de l'art qui présente une vue complete des techniques d'édition artistique de l'apparence, de l'éclairage et des matériaux dans le domaine
+de l'informatique graphique.
+
+Premièrement, le rapport s'interesse aux méthodes permettant de modifier l'apparence finale d'une image ou d'une séquence d'animation.
+L'objectif de l'édition d'apparence est d'ajuster les matériau et l'éclairage dans le but d'obtenir un resultat répondant à des critères artistiques
+précis, que ce soit pour le cinéma (auquel il y a un article dedié), l'architecture ou d'autres industries créatives.
+
+Ensuite, le document présente divers systèmes qui permettent de manipuler les éclairages, allant des approches simples comme le “light linking” aux 
+méthodes plus complexes intégrant la simulation globale de l’illumination (global illumination). Ces techniques intègrent des interfaces 
+de type « click-and-drag », de la manipulation directe ou indirecte, et même des méthodes basées sur le dessin (painting) pour adapter les ombres 
+et les reflets.
+
+La modification des matériaux s’avère particulièrement complexe du fait de la nature non linéaire des interactions entre lumière et surface. 
+Le rapport aborde : L’édition directe des paramètres (par exemple, ajuster les composantes d’un BRDF), des méthodes indirectes et basées sur des 
+contraintes, qui permettent à l’utilisateur de définir des zones ou des effets visuels souhaités avant que le système ne détermine les paramètres
+adéquats et des techniques "data-driven" qui exploitent des bases de données ou des modèles prédéfinis pour faciliter l’édition.
+
+Le rapport identifie également plusieurs défis clés, notamment la complexité du transport de la lumière, la non-linéarité des interactions 
+matériaux-lumière et le besoin impératif d’un rendu interactif de qualité. Il propose ainsi une synthèse des travaux existants et met en lumière
+les problématiques ouvertes qui guideront les recherches futures pour obtenir des outils d’édition d’apparence plus intuitifs et performants.
+
+\section{Design and Simulation of  Opera Lighting and Projection Effects}
+Cet article propose une approche complète pour la conception et la simulation des effets d’éclairage et de projection dans les productions d’opéra. 
+Il vise à offrir aux concepteurs des outils permettant de visualiser et d’optimiser en amont les configurations lumineuses et les projections, en 
+tenant compte des contraintes artistiques et techniques spécifiques au théâtre.
+
+L’étude s’intéresse à la modélisation des sources lumineuses utilisées sur scène. Chaque source est caractérisée par sa position, 
+son intensité, sa couleur et la direction de son faisceau, représentée à l’aide de diagrammes goniométriques. Un système interactif permet aux 
+concepteurs de configurer ces paramètres en temps réel et de visualiser leurs effets sur la scène, facilitant ainsi la planification et 
+la coordination entre les différents éléments de l’éclairage.
+
+Ensuite, l’article présente une méthode avancée de simulation des effets lumineux basée sur la radiosité progressive étendue.
+Cette technique permet de modéliser la propagation de la lumière dans un environnement complexe, en prenant en compte la directionnalité 
+des sources et les interactions entre les surfaces. Par ailleurs, une approche spécifique est développée pour la simulation des projections 
+scéniques, intégrant des modèles de correction de la distorsion angulaire afin d’assurer un rendu fidèle des images projetées sur des surfaces 
+non planes.
+
+Enfin, l’article illustre l’application de ces méthodes à travers plusieurs études de cas issues de productions réelles d’opéra. 
+En intégrant des modèles 3D détaillés et des algorithmes de rendu avancés, la simulation permet d’optimiser les choix artistiques et techniques 
+avant leur mise en œuvre sur scène. Cette approche améliore ainsi la collaboration entre les concepteurs et contribue à une meilleure gestion 
+des contraintes de production.
+
+
+\newpage
+\section{iCheat: A Representation for Artistic Control of Indirect Cinematic Lighting}
+
+Cet article nous présente une représentation de l'illumination indirecte qui permet sa modification artistique de manière plus simple et intuitive qu'auparavent.
+
+On nous explique d'abord comment la lumière directe est souvent manipulée au travers de shaders, puis les désavantages de l'utilisation de cette méthode pour manipuler la lumière indirecte, notamment son coût et de sa dépendence au moteur de rendu, contrairement à la solution proposée ici.
+
+On nous présente ensuite en détail la formule choisie pour la représentation. 
+
+Lors de la modification de la lumière indirecte avec cette représentation, seul le coefficient de transfert de la lumière entre 2 points est manipulé avec une échelle et un offset.  
+
+Afin de garantir l'efficacité de la solution, un échantillonage de couple de points stratégiques est fait, pour lesquels ces 2 valeurs sont stockées dans une matrice qui est ensuite compréssée avec des ondelettes de haar pour gagner en espace, et une interpolation des autres couples de points sera faite au rendu.
+
+Cette méthode est adaptée à l'animation en faisant de la même manière des modifications que sur des images clés de la vidéo, qui seront ensuite propagées sur le reste des images.
+
+Pour prouver l'utilisabilité et la portabilité de leur solution, les auteurs ont implémenté une UI simple avec selection au pinceau ainsi que 2 moteurs de rendu différents : un en temps réel utilisé pendant l'édition et un moteur haute qualité pour le rendu final.
+
+Tout au long de l'article, on peut voir des résultats obtenus avec cette implémentation , mettant ainsi en avant son efficacité et son potentiel.
+
+
+\section{Metropolis Light Transport}
+
+Cet article présente une nouvelle approche (pour son époque) de gestion du transport de lumière en informatique graphique : le Metropolis Light Transport (MLT). 
+
+Bien qu'il commence à dater, ce papier présente un concept qui est une base dans notre domaine.
+
+Contrairement aux techniques utilisées auparavant, MLT est beaucoup plus réaliste et efficace avec moins d'erreur et de bruit.
+
+Cette méthode se base sur un algorithmne qui est utilisé en physique computationnelle : le Metropolis sampling algorithm.
+
+On nous explique d'abord cet algorithme en général puis son application dans notre utilisation plus en détail.
+
+Il consiste en l'échantillonage de chemins (paths) de lumière arbitraires à partir de la mutation d'un chemin précédent. Au travers d'un coefficient de probabilité, cette mutation est acceptée ou rejetée et une autre mutation est crée à partir du dernier chemin et ainsi de suite. Cela fait une espèce de "random walk" qui génère un rendu très réaliste de la lumière.
+
+On nous délivre ensuite des résultats expérimentaux de son utilisation pour montrer son efficacité. 
+
+\newpage
 \section{Conclusion sur l'état de l'art}
 
 L'analyse chronologique des articles révèle une évolution significative des approches pour la manipulation de l'apparence des matériaux et de l'éclairage en informatique graphique.
